@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frise Chronologique des Mouvements Littéraires Français</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #ffffff;
+            overflow-x: auto; /* Keep auto for potential horizontal scroll on very wide content */
+            min-height: 100vh;
+        }
+
+        .timeline-container {
+            padding: 50px 20px;
+            position: relative;
+            /* min-width: 1200px; Removed for responsiveness */
+            width: 100%; /* Allow container to shrink */
+            max-width: 1200px; /* Optional: Keep a max-width on large screens */
+            margin: 0 auto; /* Center the container */
+        }
+
+        .timeline-header {
+            text-align: center;
+            margin-bottom: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .timeline-header h1 {
+            font-size: 3rem;
+            background: linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .timeline-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 100%; /* Ensure it doesn't overflow its container */
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background: linear-gradient(180deg, #ffd700, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+            border-radius: 3px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .period {
+            padding: 30px 0;
+            position: relative;
+            width: 100%;
+        }
+
+        .period::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ffd700;
+            border: 4px solid #1a1a2e;
+            top: 50px;
+            border-radius: 50%;
+            z-index: 1;
+            left: 50%;
+            margin-left: -10px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 15px rgba(255, 215, 0, 0.7); }
+            50% { transform: scale(1.1); box-shadow: 0 0 25px rgba(255, 215, 0, 0.9); }
+            100% { transform: scale(1); box-shadow: 0 0 15px rgba(255, 215, 0, 0.7); }
+        }
+
+        .content {
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            position: relative;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            margin: 0 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            width: calc(50% - 20px); /* Adjust width for the margin */
+        }
+
+        .content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .left { margin-right: calc(50% + 10px); } /* Adjusted margin based on content width */
+        .right { margin-left: calc(50% + 10px); } /* Adjusted margin based on content width */
+
+
+        .period-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #ffd700, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .period-dates {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+            font-style: italic;
+            color: #4ecdc4;
+        }
+
+        .movement {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .movement:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .movement-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        .movement-description {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .authors {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .author {
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.3), rgba(78, 205, 196, 0.3));
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .author:hover {
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.5), rgba(78, 205, 196, 0.5));
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Couleurs spécifiques par période */
+        .renaissance .movement { border-left-color: #ff6b6b; }
+        .classique .movement { border-left-color: #ffd700; }
+        .lumieres .movement { border-left-color: #4ecdc4; }
+        .romantisme .movement { border-left-color: #ff6b6b; }
+        .realisme .movement { border-left-color: #96ceb4; }
+        .modernite .movement { border-left-color: #45b7d1; }
+
+        .context {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-style: italic;
+            color: #e0e0e0;
+        }
+
+        /* Styles for smaller screens */
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 20px; /* Move line to the left */
+                margin-left: 0;
+            }
+
+            .period::after {
+                left: 15px; /* Align circle with the line */
+                margin-left: 0;
+            }
+
+            .content {
+                width: calc(100% - 40px); /* Full width minus margin */
+                margin-left: 40px; /* Push content to the right of the line */
+                margin-right: 0; /* Remove right margin */
+                padding: 20px; /* Reduce padding slightly */
+            }
+
+            .left, .right {
+                margin-left: 40px; /* Ensure both sides are aligned */
+                margin-right: 0;
+            }
+
+            .timeline-header h1 { font-size: 2rem; }
+            .timeline-header p { font-size: 1rem; }
+            .period-title { font-size: 1.5rem; }
+            .period-dates { font-size: 1rem; }
+            .movement-title { font-size: 1.2rem; }
+            .movement-description { font-size: 0.9rem; }
+            .author { font-size: 0.85rem; padding: 6px 12px; } /* Adjust author pill size */
+        }
+    </style>
+</head>
+<body>
+    <div class="timeline-container">
+        <div class="timeline-header">
+            <h1>Mouvements Littéraires Français</h1>
+            <p>Une traversée des siècles à travers les courants qui ont façonné notre littérature</p>
+        </div>
+
+        <div class="timeline">
+            <!-- Renaissance -->
+            <div class="period renaissance">
+                <div class="content left">
+                    <div class="period-title">Renaissance</div>
+                    <div class="period-dates">XVIe siècle</div>
+                    <div class="movement">
+                        <div class="movement-title">Humanisme</div>
+                        <div class="movement-description">
+                            Retour aux sources antiques, valorisation de la dignité humaine et développement des sciences et des arts.
+                        </div>
+                        <div class="authors">
+                            <span class="author">Érasme (~1466-1536)</span>
+                            <span class="author">Rabelais (~1483-1553)</span>
+                            <span class="author">Louise Labé (~1524-1566)</span> <!-- Ajouté -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Âge Classique -->
+            <div class="period classique">
+                <div class="content right">
+                    <div class="period-title">L'Âge Classique</div>
+                    <div class="period-dates">XVIIe siècle</div>
+                    <div class="context">
+                        Contexte : Règnes de Louis XIII et Louis XIV
+                    </div>
+                    
+                    <div class="movement">
+                        <div class="movement-title">Baroque</div>
+                        <div class="movement-description">
+                            Mouvement artistique privilégiant le mouvement, la théâtralité et l'émotion, en réaction aux canons classiques.
+                        </div>
+                         <div class="authors">
+                            <span class="author">Corneille (1606-1684)</span> <!-- Déplacé depuis Classicisme -->
+                        </div>
+                    </div>
+
+                    <div class="movement">
+                        <div class="movement-title">Préciosité</div>
+                        <div class="movement-description">
+                            Raffinement du langage et des mœurs, développé dans les salons aristocratiques.
+                        </div>
+                         <div class="authors">
+                            <span class="author">Mme de La Fayette (1634-1693)</span> <!-- Déplacé depuis Classicisme -->
+                        </div>
+                    </div>
+
+                    <div class="movement">
+                        <div class="movement-title">Classicisme</div>
+                        <div class="movement-description">
+                            Recherche de la perfection formelle, respect des règles (trois unités au théâtre), imitation des Anciens, bienséance et vraisemblance.
+                        </div>
+                        <div class="authors">
+                            <!-- Corneille et Mme de La Fayette retirés -->
+                            <span class="author">Molière (1622-1673)</span>
+                            <span class="author">Racine (1639-1699)</span>
+                            <span class="author">La Fontaine (1621-1695)</span>
+                        </div>
+                    </div>
+
+                    <div class="movement">
+                        <div class="movement-title">Libertinage</div>
+                        <div class="movement-description">
+                            Libertinage de pensée au XVIIe siècle, évoluant vers le libertinage de mœurs au XVIIIe.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Siècle des Lumières -->
+            <div class="period lumieres">
+                <div class="content left">
+                    <div class="period-title">Le Siècle des Lumières</div>
+                    <div class="period-dates">XVIIIe siècle</div>
+                    <div class="context">
+                        Investigation philosophique, remise en question des institutions
+                    </div>
+                    
+                    <div class="movement">
+                        <div class="movement-title">Les Lumières</div>
+                        <div class="movement-description">
+                            Philosophie prônant la raison, le progrès, la tolérance et la critique des institutions et des dogmes.
+                        </div>
+                        <div class="authors">
+                            <span class="author">Montesquieu (1689-1755)</span>
+                            <span class="author">Voltaire (1694-1778)</span>
+                            <span class="author">Rousseau (1712-1778)</span>
+                            <span class="author">Diderot (1713-1784)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- XIXe siècle -->
+            <div class="period romantisme">
+                <div class="content right">
+                    <div class="period-title">Le XIXe Siècle</div>
+                    <div class="period-dates">1800-1900</div>
+                    <div class="context">
+                        Empire, Restauration, Monarchie de Juillet, IIe République, Second Empire, IIIe République
+                    </div>
+                    
+                    <div class="movement">
+                        <div class="movement-title">Romantisme</div>
+                        <div class="movement-description">
+                            Primauté du sentiment, de l'individualité et de l'imagination sur la raison classique.
+                        </div>
+                        <div class="authors">
+                            <span class="author">Hugo (1802-1885)</span>
+                            <span class="author">Musset (1810-1857)</span>
+                            <span class="author">George Sand (1804-1876)</span>
+                            <span class="author">Dumas père (1802-1870)</span>
+                        </div>
+                    </div>
+
+                    <div class="movement">
+                        <div class="movement-title">Réalisme</div>
+                        <div class="movement-description">
+                            Représentation fidèle de la réalité sociale et psychologique, sans idéalisation.
+                        </div>
+                        <div class="authors">
+                            <span class="author">Flaubert (1821-1880)</span>
+                            <span class="author">Balzac (1799-1850) - précurseur</span>
+                        </div>
+                    </div>
+
+                    <div class="movement">
+                        <div class="movement-title">Naturalisme</div>
+                        <div class="movement-description">
+                            Radicalisation du réalisme, application de la méthode scientifique à la littérature.
+                        </div>
+                        <div class="authors">
+                            <span class="author">Zola (1840-1902)</span>
+                        </div>
+                    </div>
+
+                    <div class="movement">
+                        <div class="movement-title">Symbolisme</div>
+                        <div class="movement-description">
+                            Renouveau poétique privilégiant la suggestion, le symbole et la musicalité du vers.
+                        </div>
+                        <div class="authors">
+                            <span class="author">Baudelaire (1821-1867) - précurseur</span>
+                            <span class="author">Verlaine (1844-1896)</span>
+                            <span class="author">Rimbaud (1854-1891)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- XXe siècle -->
+            <div class="period modernite">
+                <div class="content left">
+                    <div class="period-title">Modernité et Avant-Gardes</div>
+                    <div class="period-dates">XXe siècle</div>
+                    <div class="context">
+                        Première et Seconde Guerres Mondiales, bouleversements sociaux et artistiques
+                    </div>
+                    
+                    <div class="movement">
+                        <div class="movement-title">Surréalisme</div>
+                        <div class="movement-description">
+                            Exploration de l'inconscient, écriture automatique et remise en cause des conventions artistiques.
+                        </div>
+                        <div class="authors">
+                            <span class="author">André Breton (1896-1966)</span>
+                        </div>
+                    </div>
+
+                    <div class="movement">
+                        <div class="movement-title">Existentialisme</div>
+                        <div class="movement-description">
+                            Philosophie de l'existence humaine, de la liberté et de la responsabilité individuelle.
+                        </div>
+                        <div class="authors">
+                            <span class="author">Jean-Paul Sartre (1905-1980)</span>
+                        </div>
+                    </div>
+
+                    <div class="movement">
+                        <div class="movement-title">L'Absurde</div>
+                        <div class="movement-description">
+                            Exploration de la condition humaine face à l'absurdité de l'existence.
+                        </div>
+                        <div class="authors">
+                            <span class="author">Camus (1913-1960)</span>
+                            <span class="author">Ionesco (1909-1994)</span>
+                        </div>
+                    </div>
+
+                    <div class="movement">
+                        <div class="movement-title">Nouveau Roman</div>
+                        <div class="movement-description">
+                            Remise en cause du personnage traditionnel, de l'intrigue et de la psychologie romanesque.
+                        </div>
+                        <div class="authors">
+                            <span class="author">Robbe-Grillet (1922-2008)</span>
+                            <span class="author">Nathalie Sarraute (1900-1999)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animation au scroll
+        function isElementInViewport(el) {
+            const rect = el.getBoundingClientRect();
+            return (
+                rect.top >= 0 &&
+                rect.left >= 0 &&
+                rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+            );
+        }
+
+        function animateOnScroll() {
+            const contents = document.querySelectorAll('.content');
+            contents.forEach(content => {
+                // Add 'visible' class when in viewport
+                if (isElementInViewport(content)) {
+                    content.classList.add('visible');
+                } else {
+                     // Optional: remove class when out of view to re-trigger on scroll back
+                     // content.classList.remove('visible'); 
+                }
+            });
+        }
+
+        // Style initial pour l'animation (handled by CSS :not(.visible) and .visible)
+        // No need to set inline styles here anymore, CSS handles it better.
+        
+        // Listen for scroll and call animation function
+        window.addEventListener('scroll', animateOnScroll);
+
+        // Run animation on page load for elements already in view
+        document.addEventListener('DOMContentLoaded', animateOnScroll);
+        
+        // Add CSS rules for animation states using a class
+        const styleSheet = document.styleSheets[0];
+        styleSheet.insertRule(`
+            .content:not(.visible) {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+        `, styleSheet.cssRules.length);
+         styleSheet.insertRule(`
+            .content.visible {
+                opacity: 1;
+                transform: translateY(0);
+                transition: opacity 0.6s ease, transform 0.6s ease; /* Apply transition here */
+            }
+        `, styleSheet.cssRules.length);
+
+
+        // Effet de parallaxe léger
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const timelineLine = document.querySelector('.timeline::before');
+            if (timelineLine) {
+                const speed = scrolled * 0.2;
+                // Parallax on pseudo-element is tricky. A simpler approach might be needed
+                // or apply to a wrapper div. Let's try applying to the whole timeline wrapper
+                // This is a simplified parallax, won't follow exactly as line is abs pos.
+                // Maybe better to remove for simplicity or use JS for better control.
+                // Keeping the original for now, though its effect on a pseudo-element is limited.
+                timelineLine.style.transform = `translateY(${speed}px)`;
+            }
+        });
+
+        // Interaction avec les auteurs
+        document.querySelectorAll('.author').forEach(author => {
+            author.addEventListener('click', function() {
+                const name = this.textContent.split(' (')[0];
+                alert(`${name} - Cliquez pour en savoir plus sur cet auteur !`);
+            });
+        });
+    </script>
+</body>
+</html>

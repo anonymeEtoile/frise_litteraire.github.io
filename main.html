@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirection des Mouvements Littéraires</title>
+    <script>
+        // Function to detect if the device is mobile
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // Redirect based on device type
+        if (isMobileDevice()) {
+            window.location.href = "frise_litteraire_phone.html";
+        } else {
+            window.location.href = "frise_litteraire.html";
+        }
+    </script>
+</head>
+<body>
+    <p>Redirection en cours...</p>
+</body>
+</html>
